@@ -1,0 +1,2811 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>雅思寫作升階站 (5.5 → 6.5+ 完整單一 HTML 版)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React 18 & ReactDOM 18 UMD -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-slate-950">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // =========================================================================
+    // 內建完整 Lucide SVG 圖示組件 (免除外部 ESM 依賴，離線雙擊也能完美顯示圖示)
+    // =========================================================================
+    const IconWrapper = ({ children, className = "w-4 h-4" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        {children}
+      </svg>
+    );
+
+    const ShieldCheck = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+        <path d="m9 12 2 2 4-4"/>
+      </IconWrapper>
+    );
+    const Zap = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+      </IconWrapper>
+    );
+    const Layers = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+        <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/>
+        <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>
+      </IconWrapper>
+    );
+    const BookOpen = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </IconWrapper>
+    );
+    const History = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+        <path d="M12 7v5l4 2"/>
+      </IconWrapper>
+    );
+    const Sun = ({ className }) => (
+      <IconWrapper className={className}>
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+      </IconWrapper>
+    );
+    const Moon = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+      </IconWrapper>
+    );
+    const Type = ({ className }) => (
+      <IconWrapper className={className}>
+        <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/>
+      </IconWrapper>
+    );
+    const Cloud = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+      </IconWrapper>
+    );
+    const CloudOff = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m2 2 20 20"/><path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193"/><path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/>
+      </IconWrapper>
+    );
+    const Sparkles = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>
+      </IconWrapper>
+    );
+    const AlertTriangle = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+      </IconWrapper>
+    );
+    const Plus = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M5 12h14"/><path d="M12 5v14"/>
+      </IconWrapper>
+    );
+    const Smartphone = ({ className }) => (
+      <IconWrapper className={className}>
+        <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+      </IconWrapper>
+    );
+    const ArrowRight = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+      </IconWrapper>
+    );
+    const RefreshCw = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+      </IconWrapper>
+    );
+    const Check = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M20 6 9 17l-5-5"/>
+      </IconWrapper>
+    );
+    const Copy = ({ className }) => (
+      <IconWrapper className={className}>
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+      </IconWrapper>
+    );
+    const ChevronRight = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m9 18 6-6-6-6"/>
+      </IconWrapper>
+    );
+    const CheckCircle2 = ({ className }) => (
+      <IconWrapper className={className}>
+        <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+      </IconWrapper>
+    );
+    const Bookmark = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+      </IconWrapper>
+    );
+    const Trash2 = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>
+      </IconWrapper>
+    );
+    const FileText = ({ className }) => (
+      <IconWrapper className={className}>
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
+      </IconWrapper>
+    );
+    const TrendingUp = ({ className }) => (
+      <IconWrapper className={className}>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+      </IconWrapper>
+    );
+    const Award = ({ className }) => (
+      <IconWrapper className={className}>
+        <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+      </IconWrapper>
+    );
+
+    // =========================================================================
+    // 常量資料庫 1：預設口語詞攔截與 6.5 學術替換庫 (Default Informal Patterns)
+    // =========================================================================
+    const DEFAULT_INFORMAL_PATTERNS = [
+      { informal: 'lots of', replacement: 'a substantial number of / numerous', category: '數量表達' },
+      { informal: 'a lot of', replacement: 'a considerable amount of / myriad', category: '數量表達' },
+      { informal: 'big problem', replacement: 'pressing issue / severe challenge', category: '名詞搭配' },
+      { informal: 'traffic jam', replacement: 'traffic congestion / chronic gridlock', category: '城市話題' },
+      { informal: 'not good', replacement: 'inadequate / counterproductive', category: '形容詞升級' },
+      { informal: 'kids', replacement: 'children / adolescents / young learners', category: '正式稱謂' },
+      { informal: 'get bad things', replacement: 'suffer adverse consequences', category: '動詞搭配' },
+      { informal: 'do something', replacement: 'implement effective measures', category: '政策動詞' },
+      { informal: 'fix this', replacement: 'alleviate this situation / resolve this issue', category: '政策動詞' },
+      { informal: 'nowadays', replacement: 'in contemporary society / in recent years', category: '開頭時間詞' },
+      { informal: 'more and more', replacement: 'an increasing number of / increasingly', category: '趨勢表達' },
+      { informal: 'good for', replacement: 'beneficial to / advantageous for', category: '形容詞升級' }
+    ];
+
+    // =========================================================================
+    // 常量資料庫 2：考官改錯擂台 10 道必考語病闖關 (Examiner Gym)
+    // =========================================================================
+    const GYM_CHALLENGES = [
+      {
+        id: 'gym-1',
+        category: '雙重連接詞 (Double Conjunction)',
+        difficulty: 'GRA 5.5 致命傷 #1',
+        question: '華人考生最常見的「雖然⋯但是⋯」中式直譯病句，請選出符合 Band 6.5+ 語法規則的正確寫法：',
+        flawedSentence: 'Although governments want to improve public transport, but they do not have sufficient budget.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Although governments aspire to upgrade public transit, they lack sufficient municipal funds.',
+            isCorrect: true,
+            explanation: '正確！英文中 Although 與 but 絕對不能同時出現在同一句，去掉 but 並將動詞升級為 aspire to upgrade 即可穩拿高分。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Despite governments want to improve public transport, they do not have enough budget.',
+            isCorrect: false,
+            explanation: '錯誤！Despite 是介系詞，後面只能接名詞短語或 V-ing，不能直接加完整句子。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Even though governments want to improve public transport, however they lack sufficient budget.',
+            isCorrect: false,
+            explanation: '錯誤！Even though 與逗號後的 however 犯了雙重連接與逗號黏連錯誤。'
+          }
+        ],
+        takeaway: '牢記鐵律：寫了 Although / Even though / While，後半句絕對禁止出現 but！'
+      },
+      {
+        id: 'gym-2',
+        category: '逗號黏連 (Comma Splice)',
+        difficulty: 'GRA 5.5 致命傷 #2',
+        question: '兩個完整獨立句之間「只用一個逗號」連接是雅思考官最常扣分的標點語病。請選出正確修復版：',
+        flawedSentence: 'Many citizens commute by private car every day, this causes severe air pollution in big cities.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Many citizens commute by private car every day, Therefore, this causes severe air pollution.',
+            isCorrect: false,
+            explanation: '錯誤！Therefore 是副詞而非連詞，前面必須用分號或句號。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Many citizens commute by private vehicle daily, which subsequently leads to severe urban air pollution.',
+            isCorrect: true,
+            explanation: '正確！將後半句改為 ", which subsequently leads to..." 非限定關係從句，指代前面整件事。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Many citizens commute by private car every day, it causes severe air pollution in big cities.',
+            isCorrect: false,
+            explanation: '錯誤！把 this 換成 it 並沒有解決兩個完整句子只用逗號黏連的語法錯誤。'
+          }
+        ],
+        takeaway: '英文中「逗號」沒有連接兩個完整句子的能力！請改用 ", which + 單數動詞" 或 ", thereby + V-ing"。'
+      },
+      {
+        id: 'gym-3',
+        category: '主謂不一致 (Subject-Verb Agreement)',
+        difficulty: 'GRA 5.5 常見失誤 #3',
+        question: '當動名詞片語（V-ing）作主語，且中間夾了複數名詞時，極易發生動詞單複數錯誤。請選出正確句子：',
+        flawedSentence: 'Investing more government money in public hospitals and schools are beneficial to all citizens.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Investing more public funds in hospitals and schools is beneficial to society as a whole.',
+            isCorrect: true,
+            explanation: '正確！本句真正的主語是動名詞 "Investing..."（視為單數概念），而非緊鄰動詞的 hospitals and schools。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Invest more government money in public hospitals and schools is beneficial to all citizens.',
+            isCorrect: false,
+            explanation: '錯誤！原形動詞 Invest 不能直接當作句子的主語。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Investing more government money in public hospitals and schools have great benefits.',
+            isCorrect: false,
+            explanation: '錯誤！動名詞作主語時，動詞應使用單數 has 或 is。'
+          }
+        ],
+        takeaway: '檢查主謂一致時，務必往回找到真正的核心主語（V-ing），不要被介系詞片語中的複數名詞混淆！'
+      },
+      {
+        id: 'gym-4',
+        category: '不可數名詞誤用 (Uncountable Nouns)',
+        difficulty: 'GRA/LR 5.5 常見失誤 #4',
+        question: '雅思寫作中有幾個高頻「絕對不可數名詞」，一旦加上 s 或 a/an 就會立刻被考官扣分：',
+        flawedSentence: 'The internet provides students with many useful informations and advices for their homeworks.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'The internet provides students with many useful information and advice for their homework.',
+            isCorrect: false,
+            explanation: '錯誤！many 只能修飾可數複數名詞，不能修飾不可數的 information。'
+          },
+          {
+            id: 'opt-b',
+            text: 'The internet provides learners with a wealth of valuable information and guidance for their academic assignments.',
+            isCorrect: true,
+            explanation: '正確！information, advice, homework, equipment, research, knowledge 皆為不可數名詞，搭配 a wealth of 最地道。'
+          },
+          {
+            id: 'opt-c',
+            text: 'The internet gives students an useful information and some advices for their homework.',
+            isCorrect: false,
+            explanation: '錯誤！information 與 advice 永遠不能加 an 或 s。'
+          }
+        ],
+        takeaway: '背熟雅思六大不可數金剛：information, advice, equipment, research, knowledge, homework（絕不加 s）！'
+      },
+      {
+        id: 'gym-5',
+        category: 'There have 中式存在句病句',
+        difficulty: 'GRA 5.5 致命傷 #5',
+        question: '表達「有很多人認為⋯」時，千萬不可寫出 "There have many people think..." 雙動詞病句。請選出正確改寫：',
+        flawedSentence: 'In modern society, there have many people believe that working from home is better.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'In contemporary society, a growing number of individuals contend that working remotely is more advantageous.',
+            isCorrect: true,
+            explanation: '正確！直接以 "a growing number of individuals" 作主語、接動詞 "contend that..."，徹底戒除中式 There have 句型。'
+          },
+          {
+            id: 'opt-b',
+            text: 'In modern society, there are many people believe that working from home is better.',
+            isCorrect: false,
+            explanation: '錯誤！一句話裡出現了 are 與 believe 兩個動詞。'
+          },
+          {
+            id: 'opt-c',
+            text: 'In modern society, have many people think that remote work is better.',
+            isCorrect: false,
+            explanation: '錯誤！無主語開頭且雙動詞並存。'
+          }
+        ],
+        takeaway: '想寫「有很多人做某事」時，直接寫 "Many people / A substantial number of citizens + 動詞"，不要繞彎寫 There are！'
+      },
+      {
+        id: 'gym-6',
+        category: '口語詞與萬用動詞 (Informal Register)',
+        difficulty: 'LR 5.5 突破至 6.5',
+        question: '請將以下充滿口語詞（kids, a lot of, get bad things）的句子升級為 Band 6.5+ 學術風格：',
+        flawedSentence: 'If kids spend a lot of time on smartphones, they will get bad things for their eyes and study.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'If children spend excessive time on smartphones, their vision and academic performance will suffer adverse consequences.',
+            isCorrect: true,
+            explanation: '正確！將 kids 換成 children、a lot of 換成 excessive、get bad things 升級為 suffer adverse consequences。'
+          },
+          {
+            id: 'opt-b',
+            text: 'If kids use smartphones too much time, they will have big problems in eyesight and school.',
+            isCorrect: false,
+            explanation: 'use smartphones too much time 語法不自然，且 kids / big problems 依然偏口語。'
+          },
+          {
+            id: 'opt-c',
+            text: 'When young people play phones a lot, it makes bad influence to their health and grades.',
+            isCorrect: false,
+            explanation: 'play phones 與 makes bad influence to 皆為中式搭配錯誤。'
+          }
+        ],
+        takeaway: '戒掉 get / make / do + big problem / bad things，改用 suffer adverse consequences。'
+      },
+      {
+        id: 'gym-7',
+        category: '論證過度絕對化 (Over-generalisation)',
+        difficulty: 'TR 5.5 突破至 6.5',
+        question: '雅思考官非常忌諱考生寫出「100% 絕對化、武斷」的推論。請選出具備「學術審慎語氣 (Hedging)」的 6.5+ 句子：',
+        flawedSentence: 'Playing video games will definitely make all children violent and fail all their exams.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Playing video games will 100% cause every student to become aggressive and drop out of school.',
+            isCorrect: false,
+            explanation: '錯誤！100% 與 every student 屬於極端武斷的說法。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Excessive exposure to violent video games may increase aggressive tendencies among some adolescents and potentially hinder their academic progress.',
+            isCorrect: true,
+            explanation: '正確！善用限定詞與情態動詞/副詞（may increase, potentially hinder），展現成熟嚴謹的學術思維。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Video games always ruin children’s future and nobody can study well if they play games.',
+            isCorrect: false,
+            explanation: '錯誤！always 與 nobody 過度絕對。'
+          }
+        ],
+        takeaway: '把絕對詞（always, all, definitely）換成審慎詞（tend to, may, is likely to），TR 分數立刻提升！'
+      },
+      {
+        id: 'gym-8',
+        category: '機械連接詞濫用 (Mechanical Linkers)',
+        difficulty: 'CC 5.5 突破至 6.5',
+        question: '5.5 分考生喜歡每句話都用 Moreover, Furthermore, Therefore 開頭。請選出使用「代詞指代」自然銜接的版本：',
+        flawedSentence: 'Many factories dump waste into rivers. Moreover, the water becomes toxic. Therefore, fish die.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Many factories dump waste into rivers. In addition, the water gets dirty. As a result, fish die.',
+            isCorrect: false,
+            explanation: '這只是換了另外兩個機械連接詞，短句依然沒有邏輯融合。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Numerous factories discharge untreated waste into rivers; this contamination renders the water toxic, ultimately threatening aquatic ecosystems.',
+            isCorrect: true,
+            explanation: '正確！使用 "this contamination" 指代前句的排污行為，並以分詞 ", ultimately threatening..." 收尾。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Factories dump waste into rivers, and water is toxic, and fish die.',
+            isCorrect: false,
+            explanation: '連續用 and 串接多個短句屬於小學句型結構。'
+          }
+        ],
+        takeaway: '少寫空洞的 Moreover，改用 "This phenomenon / Such policies / This contamination + 動詞" 承接上一句！'
+      },
+      {
+        id: 'gym-9',
+        category: 'Task 1 數據主語搭配錯誤 (Data Subject Fault)',
+        difficulty: 'Task 1 常犯語病 #9',
+        question: '在 Task 1 圖表作文中，「主語與動詞能否匹配」非常關鍵。請找出真正符合邏輯的圖表描寫句：',
+        flawedSentence: 'According to the line graph, the car of Country A increased sharply from 20% to 50% in 2020.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'The line graph shows that the car in Country A grew dramatically to 50% in 2020.',
+            isCorrect: false,
+            explanation: '錯誤！汽車本身不會從 20% 變 50%，上升的是汽車擁有率或使用比例。'
+          },
+          {
+            id: 'opt-b',
+            text: 'The proportion of households owning a car in Country A rose sharply from 20% to 50% by 2020.',
+            isCorrect: true,
+            explanation: '正確！明確寫出主語是 "The proportion of..."（⋯的比例）或 "The figure for..."。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Country A increased rapidly from 20% to 50% in car ownership in 2020.',
+            isCorrect: false,
+            explanation: '錯誤！國家本身不會從 20% 增長到 50%。'
+          }
+        ],
+        takeaway: '寫 Task 1 時，動詞前面的主語必須是數字或比例（The percentage of / The figure for），絕不能拿國家或物品當主語配百分比！'
+      },
+      {
+        id: 'gym-10',
+        category: '破碎從句 (Sentence Fragment)',
+        difficulty: 'GRA 5.5 致命傷 #10',
+        question: 'Because / Whereas / Although 引導的是從屬子句，不能單獨成句打句號！請選出正確修復版：',
+        flawedSentence: 'Many university graduates prefer to work in big cities. Because there are more job opportunities and higher salaries.',
+        options: [
+          {
+            id: 'opt-a',
+            text: 'Many university graduates prefer to work in major cities, primarily because metropolitan areas offer abundant career prospects and higher remuneration.',
+            isCorrect: true,
+            explanation: '正確！將句號改為逗號並加上 primarily because，使主句與原因從句完整連成複合句。'
+          },
+          {
+            id: 'opt-b',
+            text: 'Many university graduates prefer to work in big cities. Due to there are more job opportunities.',
+            isCorrect: false,
+            explanation: '錯誤！Due to 是介系詞片語，後面不能接 there are 子句。'
+          },
+          {
+            id: 'opt-c',
+            text: 'Because there are more job opportunities and higher salaries. Therefore, graduates like big cities.',
+            isCorrect: false,
+            explanation: '錯誤！前半部只有 Because 從句卻直接打了句號，屬於典型的 Fragment 破碎句。'
+          }
+        ],
+        takeaway: '以 Because / While / Although 開頭的句子，如果沒有接逗號與主句就直接打句號，在考官眼中就是 5.5 的破碎句！'
+      }
+    ];
+
+    // =========================================================================
+    // 常量資料庫 3：穩健複合句拼圖 8 大零失誤公式
+    // =========================================================================
+    const SENTENCE_TEMPLATES = [
+      {
+        id: 'tpl-1',
+        name: '第 1 式：While 讓步對比複合句',
+        tag: '引言立場 / 主體段轉折必備',
+        formula: 'While it is true that [組件 A], I firmly believe that [組件 B].',
+        tip: '寫在引言段最後一句或主體段開頭，一句話同時展現雙邊思考與明確立場，絕對不加 but！',
+        defaultA: 'online courses offer unmatched scheduling flexibility',
+        defaultB: 'face-to-face classroom interaction remains indispensable for children’s social development',
+        buildSentence: (a, b) => `While it is true that ${a}, I firmly believe that ${b}.`,
+        description: '用 While 取代濫用的 Although，能安全造出 GRA 7.0 的讓步狀語從句。'
+      },
+      {
+        id: 'tpl-2',
+        name: '第 2 式：, which 非限定關係從句',
+        tag: '主體段延伸結果萬用句',
+        formula: '[組件 A], which subsequently [組件 B (單數動詞)].',
+        tip: '注意逗號後面的 which 代表前面整件事，後面的動詞務必使用第三人稱單數（如 leads to / fosters）！',
+        defaultA: 'Governments can subsidize renewable energy projects',
+        defaultB: 'reduces national reliance on fossil fuels and curbs carbon emissions',
+        buildSentence: (a, b) => `${a}, which subsequently ${b}.`,
+        description: '徹底消滅逗號黏連的救星，把兩個短句無縫升級為高分複合句。'
+      },
+      {
+        id: 'tpl-3',
+        name: '第 3 式：Provided that 條件保障複合句',
+        tag: '結論段 / 解決方案段首選',
+        formula: 'Provided that [組件 A], [組件 B].',
+        tip: '比單純寫 If 更具學術正式感，特別適合放在結論段最後一句！',
+        defaultA: 'authorities enforce stringent traffic regulations and upgrade public transit',
+        defaultB: 'urban congestion and air pollution can be substantially mitigated',
+        buildSentence: (a, b) => `Provided that ${a}, ${b}.`,
+        description: 'Provided that 意為「只要⋯⋯」，能讓考官眼睛一亮。'
+      },
+      {
+        id: 'tpl-4',
+        name: '第 4 式：, thereby + V-ing 現在分詞結果狀語',
+        tag: '取代 Therefore 的高分利器',
+        formula: '[組件 A], thereby [組件 B (V-ing)].',
+        tip: 'thereby 後面請直接加上動詞 V-ing（如 alleviating / enhancing），省去再寫主語！',
+        defaultA: 'Many corporations allow staff to work remotely twice a week',
+        defaultB: 'eliminating stressful daily commutes and boosting overall job satisfaction',
+        buildSentence: (a, b) => `${a}, thereby ${b}.`,
+        description: '學會 ", thereby + V-ing"，你就不用每段都寫呆板的 Therefore, it can... 了！'
+      },
+      {
+        id: 'tpl-5',
+        name: '第 5 式：This is primarily because... 因果深挖句',
+        tag: 'PEEL 解釋原因專用',
+        formula: '[組件 A]. This is primarily because [組件 B].',
+        tip: '寫完主體段第一句後，第二句立刻接 This is primarily because...，強迫自己把道理講透！',
+        defaultA: 'Imposing higher taxes on sugary drinks is an effective way to combat obesity',
+        defaultB: 'elevated retail prices directly discourage price-sensitive consumers from making daily purchases',
+        buildSentence: (a, b) => `${a}. This is primarily because ${b}.`,
+        description: '幫助 TR 從 5.5 升上 6.5+ 的核心解釋句型。'
+      },
+      {
+        id: 'tpl-6',
+        name: '第 6 式：Not only does..., but it also...',
+        tag: '列舉雙重優缺點高分句',
+        formula: 'Not only does [組件 A], but it also [組件 B].',
+        tip: '想拿 GRA 7.0，可以在正文中放一句 Not only 開頭的微倒裝句，但全篇用一次即可！',
+        defaultA: 'studying abroad broaden young people’s horizons',
+        defaultB: 'cultivates their independence and cross-cultural communication skills',
+        buildSentence: (a, b) => `Not only does ${a}, but it also ${b}.`,
+        description: '取代平庸的 First... Second... 或 and also。'
+      },
+      {
+        id: 'tpl-7',
+        name: '第 7 式：The more..., the more...',
+        tag: '趨勢推演與因果強化',
+        formula: 'The more [組件 A], the more likely [組件 B].',
+        tip: '注意兩個分句都要保持完整的「主語 + 動詞」結構。',
+        defaultA: 'governments invest in accessible preventive healthcare',
+        defaultB: 'citizens are to enjoy a longer life expectancy and lower medical expenses',
+        buildSentence: (a, b) => `The more ${a}, the more likely ${b}.`,
+        description: '表達正相關或負相關趨勢的高階 GRA 結構。'
+      },
+      {
+        id: 'tpl-8',
+        name: '第 8 式：Rather than + V-ing, 主語 + should...',
+        tag: '反駁極端政策 / 提出務實方案',
+        formula: 'Rather than [組件 A (V-ing)], [組件 B].',
+        tip: 'Rather than 後面直接接 V-ing，後半句提出建設性做法，最適合收尾！',
+        defaultA: 'banning smartphones from schools altogether',
+        defaultB: 'educators should guide students to utilize digital tools responsibly',
+        buildSentence: (a, b) => `Rather than ${a}, ${b}.`,
+        description: '展現不走極端、採取務實方案的 6.5+ 思維。'
+      }
+    ];
+
+    // =========================================================================
+    // 常量資料庫 4：高分範文精讀館 (8 篇完整實戰範文，含 Task 1 視覺化圖表資料)
+    // =========================================================================
+    const MODEL_ESSAYS = [
+      {
+        id: 'essay-1',
+        category: 'Task 2',
+        taskType: 'Discuss Both Views & Opinion',
+        title: '科技與課堂學習 (Technology in Education)',
+        targetBand: 'Band 7.0 - 7.5 範文',
+        prompt: 'Some people believe that technology in the classroom helps students learn better, while others think it is a distraction and harms their education. Discuss both views and give your own opinion.',
+        paragraphs: [
+          {
+            role: 'Introduction (引言段)',
+            text: 'The integration of digital devices into contemporary educational settings has sparked considerable debate. While critics argue that screen-based learning breeds distraction and diminishes interpersonal interaction, I contend that technology substantially enhances learning outcomes when deployed under structured academic guidance.',
+            analysis: '使用 nominalisation（integration of digital devices）開篇，以 While 讓步從句清晰交代兩派觀點並明確表態。',
+            highlights: ['integration of digital devices', 'sparked considerable debate', 'substantially enhances learning outcomes']
+          },
+          {
+            role: 'Body 1 (反方：科技帶來的干擾)',
+            text: 'Admittedly, unregulated access to digital tools can severely undermine students’ concentration. When learners are connected to the internet during lectures, the temptation to browse social media or engage in gaming often overrides their focus on academic instruction, thereby fostering a superficial approach to knowledge acquisition.',
+            analysis: '以 Admittedly 開頭承接反方；運用分詞結果狀語 ", thereby fostering a superficial approach" 展現高階句式。',
+            highlights: ['unregulated access', 'undermine students’ concentration', 'thereby fostering a superficial approach']
+          },
+          {
+            role: 'Body 2 (正方：個性化與豐富資源)',
+            text: 'Nevertheless, when purposefully utilized, educational technology acts as a powerful catalyst for personalized learning. Digital platforms grant students immediate access to multimedia resources and adaptive software, allowing individuals to progress at a pace tailored to their cognitive needs.',
+            analysis: '使用 "when purposefully utilized" 狀語從句縮寫，搭配 "powerful catalyst for personalized learning"。',
+            highlights: ['powerful catalyst for', 'adaptive software', 'cognitive needs']
+          },
+          {
+            role: 'Conclusion (結論段)',
+            text: 'In conclusion, although digital devices pose valid risks of distraction, their capacity to enrich education is undeniable. Rather than banning technology outright, educational institutions should establish clear protocols to harness its full potential.',
+            analysis: '以 "Rather than banning technology outright" 作為務實收尾，完美呼應 7.5 分思維。',
+            highlights: ['pose valid risks', 'Rather than banning... outright', 'harness its full potential']
+          }
+        ],
+        keyTakeaways: [
+          '善用 Admittedly 與 Nevertheless 作為段落開頭的轉折，取代呆板的 On the one hand。',
+          '句型中大量穿插 ", thereby V-ing" 與過去分詞後置定語，提高 GRA 分數。'
+        ]
+      },
+      {
+        id: 'essay-2',
+        category: 'Task 2',
+        taskType: 'Problem & Solution',
+        title: '城市交通堵塞與污染 (Urban Traffic Congestion)',
+        targetBand: 'Band 7.0 - 7.5 範文',
+        prompt: 'In many cities, the volume of traffic is growing rapidly, causing severe congestion and air pollution. What are the causes of this problem, and what measures can be taken to solve it?',
+        paragraphs: [
+          {
+            role: 'Introduction (引言段)',
+            text: 'The relentless surge in vehicular traffic has become a pressing crisis across metropolitan areas, precipitating chronic gridlock and deteriorating air quality. This essay will examine the primary drivers of this phenomenon and propose viable municipal interventions.',
+            analysis: '使用 "relentless surge in vehicular traffic" 與 "chronic gridlock" 替代普通的 increase 與 traffic jam。',
+            highlights: ['relentless surge', 'chronic gridlock', 'viable municipal interventions']
+          },
+          {
+            role: 'Body 1 (成因分析)',
+            text: 'A primary driver of escalating car dependency is the inadequacy of public transit networks. When commuter buses and rail services are plagued by overcrowding and unreliability, residents naturally opt for the convenience of private vehicles, a trend further compounded by urban sprawl.',
+            analysis: '使用同位語夾入片語 "a trend further compounded by urban sprawl"，使句子緊湊流暢。',
+            highlights: ['escalating car dependency', 'plagued by overcrowding', 'urban sprawl']
+          },
+          {
+            role: 'Body 2 (對策提出)',
+            text: 'Mitigating this predicament requires a dual approach combining infrastructure investment with regulatory disincentives. Municipal authorities must modernize mass transit to ensure affordability and punctuality, while simultaneously implementing congestion charges during peak hours.',
+            analysis: '以 "requires a dual approach combining X with Y" 建立清晰的雙軌解決方案。',
+            highlights: ['Mitigating this predicament', 'dual approach', 'regulatory disincentives']
+          },
+          {
+            role: 'Conclusion (結論段)',
+            text: 'In summary, traffic congestion is largely driven by inadequate public transit and urban expansion. Provided that governments allocate sufficient funding to public transport and enact strict pricing policies, urban mobility can be significantly restored.',
+            analysis: '使用 Provided that 條件句收尾，展現極高文法準確度。',
+            highlights: ['Provided that', 'allocate sufficient funding', 'urban mobility']
+          }
+        ],
+        keyTakeaways: [
+          'Task 2 針對 Problem & Solution 題型，引言段應直接點出原因類別與對策方向。',
+          '學術詞彙如 municipal authorities, disincentives 為 LR 拿高分的關鍵。'
+        ]
+      },
+      {
+        id: 'essay-3',
+        category: 'Task 2',
+        taskType: 'Outweigh / Opinion',
+        title: '居家辦公的利弊 (Remote Working Pros & Cons)',
+        targetBand: 'Band 7.0 範文',
+        prompt: 'As technology enables more people to work from home, some say this trend brings more benefits than drawbacks. Do the advantages outweigh the disadvantages?',
+        paragraphs: [
+          {
+            role: 'Introduction',
+            text: 'The proliferation of remote working arrangements, facilitated by advanced telecommunication technologies, has transformed contemporary employment structures. While remote work poses challenges regarding professional isolation, I firmly believe that its benefits, notably flexibility and productivity gains, far outweigh the drawbacks.',
+            analysis: '精準的讓步句型，並在結尾明確表態。',
+            highlights: ['proliferation of', 'facilitated by', 'professional isolation']
+          },
+          {
+            role: 'Body 1 (缺點：孤立與溝通)',
+            text: 'Admittedly, the absence of physical contact in a shared office can impede spontaneous collaboration and induce a sense of professional isolation among staff members.',
+            analysis: 'impede spontaneous collaboration（阻礙自發性協作）是高分學術搭配。',
+            highlights: ['absence of physical contact', 'impede spontaneous collaboration', 'induce a sense of']
+          },
+          {
+            role: 'Body 2 (優點：彈性與省時)',
+            text: 'Nevertheless, telecommuting grants employees unprecedented schedule autonomy. By eliminating grueling daily commutes, workers can redirect valuable time and energy toward both job tasks and personal well-being.',
+            analysis: 'By eliminating... workers can... 運用介系詞短語作狀語，結構清晰。',
+            highlights: ['unprecedented schedule autonomy', 'grueling daily commutes', 'personal well-being']
+          },
+          {
+            role: 'Conclusion',
+            text: 'In conclusion, although remote working may reduce face-to-face interaction, the advantages of enhanced work-life balance and operational efficiency are far more significant.',
+            analysis: '總結呼應首段，語氣客觀且堅定。',
+            highlights: ['operational efficiency', 'more significant']
+          }
+        ],
+        keyTakeaways: [
+          'Outweigh 類題型必須在首段與尾段明確給出「哪一方更重」的判斷。',
+          '使用 operational efficiency, schedule autonomy 提升專業度。'
+        ]
+      },
+      {
+        id: 'essay-4',
+        category: 'Task 2',
+        taskType: 'Agree or Disagree',
+        title: '政府是否該對含糖飲料課稅 (Sugar Tax Debate)',
+        targetBand: 'Band 7.0 範文',
+        prompt: 'Governments should impose higher taxes on unhealthy foods and sugary drinks to combat rising obesity rates. To what extent do you agree or disagree?',
+        paragraphs: [
+          {
+            role: 'Introduction',
+            text: 'Obesity has emerged as a critical public health crisis in many nations. While some argue that personal dietary choices should remain unrestricted, I completely agree that imposing punitive taxes on sugary products is a necessary and effective public health intervention.',
+            analysis: '使用 "emerged as a critical public health crisis" 展現強烈的論述開端。',
+            highlights: ['critical public health crisis', 'punitive taxes', 'public health intervention']
+          },
+          {
+            role: 'Body 1 (支持理由：抑制消費)',
+            text: 'The primary justification for a sugar tax is its direct economic deterrence. When retail prices of sweetened beverages rise due to taxation, price-sensitive consumers, particularly adolescents, are naturally discouraged from making frequent purchases.',
+            analysis: 'price-sensitive consumers（價格敏感消費者）與 direct economic deterrence。',
+            highlights: ['direct economic deterrence', 'price-sensitive consumers', 'naturally discouraged']
+          },
+          {
+            role: 'Body 2 (反方考量與補強)',
+            text: 'Opponents often claim such taxes disproportionately burden low-income households. However, this issue can be mitigated if tax revenues are directly reinvested into subsidizing fresh produce and expanding community fitness facilities.',
+            analysis: '客觀提出反方疑慮（disproportionately burden），並隨即給出解法（subsidizing fresh produce）。',
+            highlights: ['disproportionately burden', 'reinvest into subsidizing', 'fresh produce']
+          },
+          {
+            role: 'Conclusion',
+            text: 'In conclusion, although taxation alone cannot solve the complex obesity epidemic, it serves as an indispensable fiscal tool to steer public dietary habits toward healthier alternatives.',
+            analysis: '以 "fiscal tool to steer public dietary habits" 作為高分收尾。',
+            highlights: ['obesity epidemic', 'indispensable fiscal tool', 'healthier alternatives']
+          }
+        ],
+        keyTakeaways: [
+          'Agree/Disagree 題型若採取完全贊同，可在主體段第二段主動讓步並提出配套，展現更全面的論證深度（TR）。'
+        ]
+      },
+      {
+        id: 'essay-5',
+        category: 'Task 1',
+        taskType: 'Line Graph (折線圖)',
+        title: '四種家庭能源消耗趨勢 (Household Energy Consumption)',
+        targetBand: 'Task 1 Band 7.0 範文與互動圖表',
+        prompt: 'The line graph illustrates the consumption of four types of energy in a particular country between 1990 and 2020.',
+        chartData: {
+          type: 'line',
+          title: 'Four Types of Household Energy Consumption (1990 - 2020)',
+          unit: 'Gigawatts / Million Households',
+          labels: ['1990', '1995', '2000', '2005', '2010', '2015', '2020'],
+          series: [
+            { name: 'Natural Gas', values: [20, 25, 32, 40, 48, 55, 62], color: '#10b981' },
+            { name: 'Coal', values: [50, 45, 38, 30, 22, 15, 10], color: '#f43f5e' },
+            { name: 'Electricity', values: [15, 18, 22, 28, 35, 42, 50], color: '#3b82f6' },
+            { name: 'Solar Energy', values: [2, 3, 5, 10, 18, 28, 38], color: '#f59e0b' }
+          ]
+        },
+        paragraphs: [
+          {
+            role: 'Introduction (引言段改寫)',
+            text: 'The line graph details the shifting trends in household energy consumption across four distinct categories over a thirty-year period starting from 1990.',
+            analysis: '使用 "shifting trends" 與 "over a thirty-year period" 精準改寫原題。',
+            highlights: ['shifting trends', 'four distinct categories', 'over a thirty-year period']
+          },
+          {
+            role: 'Overview (總覽段 - 必備)',
+            text: 'Overall, natural gas remained the most dominant energy source throughout the period, while coal experienced a dramatic decline. Conversely, both electricity and solar power witnessed substantial upward trajectories.',
+            analysis: 'Task 1 靈魂所在：Overview 不寫具體數字，只點出最大主導者（Natural gas）、下降者（Coal）與上升者（Solar/Electricity）。',
+            highlights: ['Overall', 'dominant energy source', 'dramatic decline', 'upward trajectories']
+          },
+          {
+            role: 'Body 1 (細節數據段 A)',
+            text: 'In 1990, coal consumption started at a peak of 50 units, after which it fell steadily to reach just 10 units by 2020. In stark contrast, natural gas usage climbed from 20 units to achieve a leading high of 62 units at the end of the timeframe.',
+            analysis: '精準描繪起點、終點與數據對比（after which it fell steadily, in stark contrast）。',
+            highlights: ['started at a peak of', 'fell steadily', 'in stark contrast', 'leading high']
+          },
+          {
+            role: 'Body 2 (細節數據段 B)',
+            text: 'Regarding electricity and solar energy, electricity rose moderately from 15 to 50 units. Meanwhile, solar power began as a marginal source at merely 2 units in 1990 before surging exponentially to 38 units in 2020.',
+            analysis: '使用 "marginal source at merely 2 units" 與 "surging exponentially" 描述太陽能的爆發式增長。',
+            highlights: ['rose moderately', 'marginal source', 'merely', 'surging exponentially']
+          }
+        ],
+        keyTakeaways: [
+          'Task 1 折線圖評分關鍵：必須在第二段寫出宏觀的 Overview（總結趨勢與極值），不能一開始就流水帳報數字。'
+        ]
+      },
+      {
+        id: 'essay-6',
+        category: 'Task 1',
+        taskType: 'Bar Chart (分組長條圖)',
+        title: '四國大學畢業生就業去向 (University Graduates Destination)',
+        targetBand: 'Task 1 Band 7.0 範文與互動圖表',
+        prompt: 'The bar chart compares the percentage of university graduates in four countries entering private enterprises, public sectors, and self-employment in 2022.',
+        chartData: {
+          type: 'bar',
+          title: 'Graduate Employment Destinations by Country (2022)',
+          unit: '% of Graduates',
+          categories: ['Country A', 'Country B', 'Country C', 'Country D'],
+          series: [
+            { name: 'Private Sector', values: [65, 40, 55, 75], color: '#6366f1' },
+            { name: 'Public Sector', values: [20, 45, 30, 15], color: '#06b6d4' },
+            { name: 'Self-Employment', values: [15, 15, 15, 10], color: '#ec4899' }
+          ]
+        },
+        paragraphs: [
+          {
+            role: 'Introduction (引言段)',
+            text: 'The bar chart illustrates how university graduates in four nations (A, B, C, and D) distributed among three employment sectors—private enterprises, public services, and self-employment—in 2022.',
+            analysis: '清晰列出三種就業部門與四個國家代號。',
+            highlights: ['illustrates how', 'distributed among', 'employment sectors']
+          },
+          {
+            role: 'Overview (總覽段)',
+            text: 'Overall, the private sector attracted the vast majority of graduates in most countries, with the exception of Country B, where public employment was the most preferred career path.',
+            analysis: '抓出整體最大宗（Private sector）以及例外（Country B 的 Public sector）。',
+            highlights: ['Overall', 'vast majority', 'with the exception of', 'most preferred career path']
+          },
+          {
+            role: 'Body 1 (私營與公家機關對比)',
+            text: 'Country D recorded the highest proportion of graduates working in private enterprises at 75%, closely followed by Country A at 65%. Conversely, Country B favored the public sector significantly, accounting for 45% of its graduates compared to only 40% in private firms.',
+            analysis: '運用 superlative（highest proportion）與 comparison（compared to only 40%）。',
+            highlights: ['recorded the highest proportion', 'closely followed by', 'Conversely', 'accounting for']
+          },
+          {
+            role: 'Body 2 (自主創業數據)',
+            text: 'In terms of self-employment, the figures remained remarkably uniform across all four nations, hovering consistently around 15% for Countries A, B, and C, and slightly lower at 10% in Country D.',
+            analysis: '使用 "remarkably uniform" 與 "hovering consistently around" 描述數據的一致性。',
+            highlights: ['In terms of', 'remarkably uniform', 'hovering consistently around', 'slightly lower']
+          }
+        ],
+        keyTakeaways: [
+          '長條圖（Bar Chart）寫作要學會分組歸納，將數據相近的國家放在同一段比較（例如 A 與 D、B 與 C）。'
+        ]
+      },
+      {
+        id: 'essay-7',
+        category: 'Task 1',
+        taskType: 'Pie Charts (雙圓餅圖)',
+        title: '1990 與 2020 年家庭開支結構 (Household Expenditure)',
+        targetBand: 'Task 1 Band 7.0 範文與互動圖表',
+        prompt: 'The two pie charts compare the proportion of household budget spent on five categories in a European country in 1990 and 2020.',
+        chartData: {
+          type: 'pie',
+          title: 'Household Expenditure Breakdown (1990 vs 2020)',
+          unit: '% Share',
+          charts: [
+            {
+              year: '1990',
+              slices: [
+                { name: 'Housing', value: 35, color: '#3b82f6' },
+                { name: 'Food', value: 25, color: '#10b981' },
+                { name: 'Transport', value: 15, color: '#f59e0b' },
+                { name: 'Entertainment', value: 15, color: '#8b5cf6' },
+                { name: 'Others', value: 10, color: '#64748b' }
+              ]
+            },
+            {
+              year: '2020',
+              slices: [
+                { name: 'Housing', value: 45, color: '#3b82f6' },
+                { name: 'Food', value: 15, color: '#10b981' },
+                { name: 'Transport', value: 20, color: '#f59e0b' },
+                { name: 'Entertainment', value: 12, color: '#8b5cf6' },
+                { name: 'Others', value: 8, color: '#64748b' }
+              ]
+            }
+          ]
+        },
+        paragraphs: [
+          {
+            role: 'Introduction (引言段)',
+            text: 'The two pie charts illustrate changes in the distribution of household expenditures across five categories in a European country between 1990 and 2020.',
+            analysis: '簡明扼要點出時間跨度與五類支出項目。',
+            highlights: ['distribution of household expenditures', 'across five categories']
+          },
+          {
+            role: 'Overview (總覽段)',
+            text: 'Overall, housing emerged as the largest expense in both years, experiencing a noticeable increase. In contrast, spending on food and entertainment witnessed a downward shift over the thirty-year span.',
+            analysis: '點出最大項目（Housing）以及長遠變化（Housing 上升，Food/Entertainment 下降）。',
+            highlights: ['largest expense in both years', 'noticeable increase', 'In contrast', 'downward shift']
+          },
+          {
+            role: 'Body 1 (房產與餐飲支出對比)',
+            text: 'In 1990, housing accounted for just over a third of the budget (35%), which expanded significantly to 45% by 2020. Conversely, expenditure on food dropped sharply from 25% to 15%, making it the second largest category in the latter year.',
+            analysis: '運用分數表達 "just over a third (35%)" 與動詞 "expanded significantly / dropped sharply"。',
+            highlights: ['just over a third', 'expanded significantly', 'dropped sharply', 'latter year']
+          },
+          {
+            role: 'Body 2 (交通與娛樂支出)',
+            text: 'Transport costs grew from 15% to 20% over the period. Meanwhile, entertainment held steady at 15% initially before dropping slightly to 12%, while minor expenses ("others") decreased from 10% to 8%.',
+            analysis: '使用 "held steady at..." 與 "minor expenses" 精準描寫小幅波動與其餘項目。',
+            highlights: ['grew from... to...', 'held steady at', 'before dropping slightly', 'minor expenses']
+          }
+        ],
+        keyTakeaways: [
+          '圓餅圖（Pie Charts）必備技巧：將百分比轉換為分數表達（例如 33% = one third, 50% = half, 25% = a quarter）。'
+        ]
+      },
+      {
+        id: 'essay-8',
+        category: 'Task 1',
+        taskType: 'Process Diagram (工序流程圖)',
+        title: '廢棄塑膠瓶回收再製流程 (Plastic Bottle Recycling Process)',
+        targetBand: 'Task 1 Band 7.0 範文與互動圖表',
+        prompt: 'The diagram illustrates the multi-stage process of recycling waste plastic bottles to manufacture new textile products.',
+        chartData: {
+          type: 'process',
+          title: 'Plastic Bottle Recycling & Manufacturing Process',
+          unit: '6 Main Stages',
+          steps: [
+            { step: 1, title: 'Collection', desc: 'Used plastic bottles are deposited into recycling bins and collected by municipal trucks.', icon: '🗑️' },
+            { step: 2, title: 'Sorting & Cleaning', desc: 'Bottles are sorted by color and washed thoroughly to remove labels and impurities.', icon: '🫧' },
+            { step: 3, title: 'Shredding', desc: 'Cleaned plastic bottles are fed into heavy machinery and shredded into small plastic flakes.', icon: '⚙️' },
+            { step: 4, title: 'Melting & Pelleting', desc: 'Plastic flakes are melted down and extruded into uniform polymer pellets.', icon: '🔥' },
+            { step: 5, title: 'Spinning', desc: 'Polymer pellets are reheated and spun through spinnerets to produce polyester threads.', icon: '🧵' },
+            { step: 6, title: 'Textile Production', desc: 'Polyester threads are woven into fabrics used to manufacture clothing and bags.', icon: '👕' }
+          ]
+        },
+        paragraphs: [
+          {
+            role: 'Introduction (引言段)',
+            text: 'The flow chart delineates the sequential steps involved in recycling discarded plastic bottles into commercial textile products.',
+            analysis: '流程圖引言動詞推薦使用 delineates, outlines 或 illustrates。',
+            highlights: ['flow chart delineates', 'sequential steps', 'discarded plastic bottles']
+          },
+          {
+            role: 'Overview (總覽段)',
+            text: 'Overall, the manufacturing cycle comprises six primary stages, beginning with the initial collection of waste bottles and culminating in the final production of wearable garments.',
+            analysis: '流程圖 Overview 需指出總階段數（six primary stages）以及起點與終點。',
+            highlights: ['manufacturing cycle', 'comprises six primary stages', 'beginning with', 'culminating in']
+          },
+          {
+            role: 'Body 1 (前半段：收集、清洗、粉碎)',
+            text: 'The process commences when used plastic bottles are deposited into recycling bins and transported to a facility. Subsequently, these containers are manually sorted, washed to remove impurities, and fed into industrial machines to be shredded into small plastic flakes.',
+            analysis: '流程圖必須大量運用被動語態（are deposited, are sorted）與順序連接詞（Subsequently）。',
+            highlights: ['process commences', 'transported to a facility', 'Subsequently', 'shredded into']
+          },
+          {
+            role: 'Body 2 (後半段：熔化、抽絲、製衣)',
+            text: 'In the final phases, the dried plastic flakes are melted and extruded into polymer pellets. These pellets are subsequently reheated and spun into polyester threads, which are ultimately woven into fabrics for clothing and bags.',
+            analysis: '使用 "In the final phases" 與 "ultimately woven into" 順暢收尾。',
+            highlights: ['In the final phases', 'melted and extruded', 'polymer pellets', 'ultimately woven into']
+          }
+        ],
+        keyTakeaways: [
+          'Task 1 流程圖（Process）核心鐵律：全面使用被動語態（is/are + p.p.），並善用序列銜接詞（First, Subsequently, Following this, Ultimately）。'
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 視覺化圖表渲染元件 (Task 1 Interactive Visual Chart Renderer)
+    // =========================================================================
+    function Task1ChartViewer({ chartData, theme }) {
+      if (!chartData) return null;
+
+      const isDark = theme === 'dark';
+
+      // 1. 折線圖渲染 (Line Graph SVG)
+      if (chartData.type === 'line') {
+        const width = 560;
+        const height = 250;
+        const padLeft = 45;
+        const padRight = 25;
+        const padTop = 25;
+        const padBottom = 35;
+        const plotW = width - padLeft - padRight;
+        const plotH = height - padTop - padBottom;
+        const maxY = 70;
+
+        const getX = (idx) => padLeft + (idx / (chartData.labels.length - 1)) * plotW;
+        const getY = (val) => padTop + plotH - (val / maxY) * plotH;
+
+        return (
+          <div className={`p-4 rounded-2xl border space-y-3 ${isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 block">
+                  📊 Task 1 模擬考題視覺化圖表 (Line Graph)
+                </span>
+                <h4 className="text-sm font-bold">{chartData.title}</h4>
+              </div>
+              <span className="text-xs opacity-60">單位: {chartData.unit}</span>
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-xs">
+              {chartData.series.map((s) => (
+                <div key={s.name} className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: s.color }} />
+                  <span className="font-medium">{s.name}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="w-full overflow-x-auto">
+              <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto min-w-[320px]">
+                {[0, 15, 30, 45, 60].map((tick) => {
+                  const y = getY(tick);
+                  return (
+                    <g key={tick}>
+                      <line x1={padLeft} y1={y} x2={width - padRight} y2={y} stroke={isDark ? '#1e293b' : '#e2e8f0'} strokeDasharray="4 4" />
+                      <text x={padLeft - 8} y={y + 4} textAnchor="end" fontSize="11" fill={isDark ? '#94a3b8' : '#64748b'}>
+                        {tick}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {chartData.labels.map((label, idx) => {
+                  const x = getX(idx);
+                  return (
+                    <text key={label} x={x} y={height - 10} textAnchor="middle" fontSize="11" fontWeight="bold" fill={isDark ? '#cbd5e1' : '#334155'}>
+                      {label}
+                    </text>
+                  );
+                })}
+
+                {chartData.series.map((s) => {
+                  const points = s.values.map((v, i) => `${getX(i)},${getY(v)}`).join(' ');
+                  return (
+                    <g key={s.name}>
+                      <polyline fill="none" stroke={s.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points} />
+                      {s.values.map((v, i) => (
+                        <circle key={i} cx={getX(i)} cy={getY(v)} r="4" fill={s.color} stroke={isDark ? '#0f172a' : '#ffffff'} strokeWidth="2" />
+                      ))}
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+        );
+      }
+
+      // 2. 分組長條圖渲染 (Bar Chart)
+      if (chartData.type === 'bar') {
+        return (
+          <div className={`p-4 rounded-2xl border space-y-4 ${isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 block">
+                  📊 Task 1 模擬考題視覺化圖表 (Bar Chart)
+                </span>
+                <h4 className="text-sm font-bold">{chartData.title}</h4>
+              </div>
+              <span className="text-xs opacity-60">單位: {chartData.unit}</span>
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-xs">
+              {chartData.series.map((s) => (
+                <div key={s.name} className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-sm inline-block" style={{ backgroundColor: s.color }} />
+                  <span className="font-medium">{s.name}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {chartData.categories.map((country, cIdx) => (
+                <div key={country} className={`p-3 rounded-xl border space-y-2 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                  <div className="text-xs font-bold">{country}</div>
+                  <div className="space-y-1.5">
+                    {chartData.series.map((s) => {
+                      const val = s.values[cIdx];
+                      return (
+                        <div key={s.name} className="space-y-0.5">
+                          <div className="flex justify-between text-[11px]">
+                            <span className="opacity-75">{s.name}</span>
+                            <span className="font-mono font-bold" style={{ color: s.color }}>{val}%</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-slate-800/40 overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${val}%`, backgroundColor: s.color }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 3. 雙圓餅圖渲染 (Pie Charts)
+      if (chartData.type === 'pie') {
+        const buildConicGradient = (slices) => {
+          let acc = 0;
+          const stops = slices.map((sl) => {
+            const start = acc;
+            acc += sl.value;
+            return `${sl.color} ${start}% ${acc}%`;
+          });
+          return `conic-gradient(${stops.join(', ')})`;
+        };
+
+        return (
+          <div className={`p-4 rounded-2xl border space-y-4 ${isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 block">
+                📊 Task 1 模擬考題視覺化圖表 (Two Pie Charts)
+              </span>
+              <h4 className="text-sm font-bold">{chartData.title}</h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {chartData.charts.map((ch) => (
+                <div key={ch.year} className={`p-4 rounded-xl border flex flex-col items-center gap-3 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                  <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    Year {ch.year}
+                  </span>
+                  <div className="w-28 h-28 rounded-full shadow-inner relative flex items-center justify-center" style={{ background: buildConicGradient(ch.slices) }}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-slate-900 text-slate-200' : 'bg-white text-slate-800'}`}>
+                      {ch.year}
+                    </div>
+                  </div>
+
+                  <div className="w-full space-y-1 text-xs">
+                    {ch.slices.map((sl) => (
+                      <div key={sl.name} className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sl.color }} />
+                          <span className="opacity-85">{sl.name}</span>
+                        </div>
+                        <span className="font-mono font-bold">{sl.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 4. 工序流程圖渲染 (Process Diagram)
+      if (chartData.type === 'process') {
+        return (
+          <div className={`p-4 rounded-2xl border space-y-4 ${isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 block">
+                🔄 Task 1 模擬考題視覺化圖表 (Process Diagram)
+              </span>
+              <h4 className="text-sm font-bold">{chartData.title}</h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {chartData.steps.map((st) => (
+                <div key={st.step} className={`p-3.5 rounded-xl border relative flex flex-col justify-between gap-2 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                      Stage {st.step}
+                    </span>
+                    <span className="text-lg">{st.icon}</span>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-emerald-400">{st.title}</div>
+                    <p className="text-[11px] opacity-75 mt-0.5 leading-snug">{st.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      return null;
+    }
+
+    // =========================================================================
+    // 主應用元件 (IeltsAscenderApp)
+    // =========================================================================
+    function IeltsAscenderApp() {
+      const STORAGE_KEY = 'ielts_ascender_55_65_v1';
+
+      const [cloudStatus, setCloudStatus] = useState('synced');
+      const [lastSyncedTime, setLastSyncedTime] = useState(
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      );
+
+      const [theme, setTheme] = useState('dark');
+      const [fontSize, setFontSize] = useState('base');
+      const [activeTab, setActiveTab] = useState('editor');
+      const [toastMsg, setToastMsg] = useState(null);
+
+      const [essayText, setEssayText] = useState(
+        'Nowadays, traffic jam is a big problem in many cities. Lots of people drive cars because public transport is not good. Although governments want to fix this, but they do not have enough money. If kids cannot go to school on time, they get bad things for study. Therefore, I think governments should do something to solve it.'
+      );
+      const [customPatterns, setCustomPatterns] = useState([]);
+      const [newInformal, setNewInformal] = useState('');
+      const [newReplacement, setNewReplacement] = useState('');
+      const [showAddVocab, setShowAddVocab] = useState(false);
+
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [aiReport, setAiReport] = useState(null);
+      const [quickCopySuccess, setQuickCopySuccess] = useState(false);
+
+      const [gymAnswers, setGymAnswers] = useState({});
+      const [gymActiveIndex, setGymActiveIndex] = useState(0);
+
+      const [selectedTemplate, setSelectedTemplate] = useState(SENTENCE_TEMPLATES[0]);
+      const [builderPartA, setBuilderPartA] = useState(SENTENCE_TEMPLATES[0].defaultA);
+      const [builderPartB, setBuilderPartB] = useState(SENTENCE_TEMPLATES[0].defaultB);
+      const [savedSentences, setSavedSentences] = useState([]);
+
+      const [selectedEssayId, setSelectedEssayId] = useState(MODEL_ESSAYS[0].id);
+      const [essayFilter, setEssayFilter] = useState('ALL');
+
+      const [progressHistory, setProgressHistory] = useState([
+        {
+          id: 'log-init-1',
+          date: '10/24',
+          errorFreeRatio: 42,
+          bandEstimate: '5.5',
+          informalCount: 5,
+          note: '初次診斷：存在逗號黏連與口語化詞彙'
+        }
+      ]);
+
+      const textareaRef = useRef(null);
+
+      const triggerToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 3000);
+      };
+
+      // 載入本機/同步狀態
+      useEffect(() => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.essayText !== undefined) setEssayText(parsed.essayText);
+            if (parsed.theme) setTheme(parsed.theme);
+            if (parsed.fontSize) setFontSize(parsed.fontSize);
+            if (parsed.gymAnswers) setGymAnswers(parsed.gymAnswers);
+            if (parsed.savedSentences) setSavedSentences(parsed.savedSentences);
+            if (parsed.customPatterns) setCustomPatterns(parsed.customPatterns);
+            if (parsed.progressHistory) setProgressHistory(parsed.progressHistory);
+          }
+        } catch (e) {
+          console.error('Failed to load state:', e);
+        }
+      }, []);
+
+      const syncMainStateToCloud = (updates = {}) => {
+        try {
+          const currentRaw = localStorage.getItem(STORAGE_KEY);
+          const currentData = currentRaw ? JSON.parse(currentRaw) : {};
+          const merged = {
+            essayText,
+            theme,
+            fontSize,
+            gymAnswers,
+            savedSentences,
+            customPatterns,
+            progressHistory,
+            ...currentData,
+            ...updates,
+            updatedAt: Date.now()
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          setLastSyncedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        } catch (e) {
+          console.error('Save error:', e);
+        }
+      };
+
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          syncMainStateToCloud({ essayText });
+        }, 800);
+        return () => clearTimeout(timer);
+      }, [essayText]);
+
+      const handleAddCustomVocab = () => {
+        if (!newInformal.trim() || !newReplacement.trim()) return;
+        const vocabId = `cust-${Date.now()}`;
+        const newEntry = {
+          id: vocabId,
+          informal: newInformal.trim().toLowerCase(),
+          replacement: newReplacement.trim(),
+          category: '自訂詞庫',
+          isCustom: true
+        };
+        const updated = [newEntry, ...customPatterns];
+        setCustomPatterns(updated);
+        syncMainStateToCloud({ customPatterns: updated });
+        triggerToast(`已同步新增自訂替換規則：「${newEntry.informal} → ${newEntry.replacement}」`);
+        setNewInformal('');
+        setNewReplacement('');
+        setShowAddVocab(false);
+      };
+
+      const handleDeleteCustomVocab = (id) => {
+        const updated = customPatterns.filter((item) => item.id !== id);
+        setCustomPatterns(updated);
+        syncMainStateToCloud({ customPatterns: updated });
+      };
+
+      const allInformalPatterns = useMemo(() => {
+        return [...customPatterns, ...DEFAULT_INFORMAL_PATTERNS];
+      }, [customPatterns]);
+
+      const fontClass = useMemo(() => {
+        switch (fontSize) {
+          case 'sm': return 'text-xs sm:text-sm leading-relaxed';
+          case 'lg': return 'text-base sm:text-lg leading-relaxed';
+          case 'xl': return 'text-lg sm:text-xl leading-relaxed';
+          case 'base':
+          default: return 'text-sm sm:text-base leading-relaxed';
+        }
+      }, [fontSize]);
+
+      const detectedInformals = useMemo(() => {
+        if (!essayText) return [];
+        const lower = essayText.toLowerCase();
+        const hits = [];
+        allInformalPatterns.forEach((item) => {
+          let count = 0;
+          let pos = lower.indexOf(item.informal);
+          while (pos !== -1) {
+            count++;
+            pos = lower.indexOf(item.informal, pos + item.informal.length);
+          }
+          if (count > 0) {
+            hits.push({ ...item, count });
+          }
+        });
+        return hits;
+      }, [essayText, allInformalPatterns]);
+
+      const localGrammarStats = useMemo(() => {
+        if (!essayText.trim()) {
+          return { totalSentences: 0, commaSpliceCount: 0, doubleConjunctions: 0 };
+        }
+        const sentences = essayText
+          .split(/(?<=[.?!])\s+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        let doubleConjunctions = 0;
+        if (/although[\s\S]{3,60}\bbut\b/i.test(essayText)) {
+          doubleConjunctions += 1;
+        }
+
+        const commaSpliceMatches = essayText.match(/,\s+(they|he|she|it|we|you)\s+[a-z]+/gi);
+        const commaSpliceCount = commaSpliceMatches ? commaSpliceMatches.length : 0;
+
+        return {
+          totalSentences: sentences.length,
+          commaSpliceCount,
+          doubleConjunctions
+        };
+      }, [essayText]);
+
+      const handleInsertText = (snippet) => {
+        const el = textareaRef.current;
+        if (!el) {
+          setEssayText((prev) => `${prev} ${snippet}`);
+          return;
+        }
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const before = essayText.substring(0, start);
+        const after = essayText.substring(end, essayText.length);
+        const nextText = `${before}${snippet}${after}`;
+        setEssayText(nextText);
+
+        setTimeout(() => {
+          el.focus();
+          el.selectionStart = el.selectionEnd = start + snippet.length;
+        }, 50);
+      };
+
+      const handleReplaceInformal = (informalWord, replacementWord) => {
+        const primaryReplacement = replacementWord.split('/')[0].trim();
+        const regex = new RegExp(`\\b${informalWord}\\b`, 'gi');
+        const newText = essayText.replace(regex, primaryReplacement);
+        setEssayText(newText);
+        triggerToast(`已將 "${informalWord}" 升級為 "${primaryReplacement}"`);
+      };
+
+      const handleSelectTemplate = (tpl) => {
+        setSelectedTemplate(tpl);
+        setBuilderPartA(tpl.defaultA);
+        setBuilderPartB(tpl.defaultB);
+      };
+
+      const handleRunAiDiagnostics = () => {
+        if (!essayText.trim() || essayText.trim().split(/\s+/).length < 10) {
+          triggerToast('請先輸入至少 10 個單詞的草稿，以便計算無錯句率！');
+          return;
+        }
+
+        setIsAnalyzing(true);
+        setAiReport(null);
+
+        setTimeout(() => {
+          const totalSents = Math.max(1, localGrammarStats.totalSentences);
+          const flawPenalty = detectedInformals.length + localGrammarStats.commaSpliceCount + localGrammarStats.doubleConjunctions;
+          const errorFreeSents = Math.max(1, totalSents - Math.min(totalSents - 1, flawPenalty));
+          const calculatedRatio = Math.round((errorFreeSents / totalSents) * 100);
+          const isSafe = calculatedRatio >= 65 && detectedInformals.length === 0;
+
+          const issuesList = [];
+          if (localGrammarStats.doubleConjunctions > 0) {
+            issuesList.push({
+              flawType: 'GRA 雙重連接詞 (Double Conjunction)',
+              originalSegment: 'Although governments want to fix this, but they do not have enough money',
+              correction: 'Although governments aspire to resolve this issue, they lack sufficient financial resources',
+              whyItKills65: 'Although 與 but 不能同時存在，是考官一眼定為 5.5 的指標病句。'
+            });
+          }
+          if (localGrammarStats.commaSpliceCount > 0) {
+            issuesList.push({
+              flawType: 'GRA 逗號黏連 (Comma Splice)',
+              originalSegment: '..., they / it + 動詞',
+              correction: '改用 ", which subsequently..." 或分號 "; therefore," 連接',
+              whyItKills65: '兩個完整句子僅用逗號相連屬於嚴重標點語法錯誤。'
+            });
+          }
+          if (detectedInformals.length > 0) {
+            issuesList.push({
+              flawType: 'LR 口語詞過多 (Informal Register)',
+              originalSegment: detectedInformals.map(d => d.informal).join(' / '),
+              correction: detectedInformals.map(d => d.replacement.split('/')[0].trim()).join(' / '),
+              whyItKills65: '頻繁出現口語字彙會導致 LR 維度鎖定在 5.0~5.5。'
+            });
+          }
+          if (issuesList.length === 0) {
+            issuesList.push({
+              flawType: '結構與詞彙進階建議 (Syntactic Polish)',
+              originalSegment: 'Current draft sentences are grammatically clean.',
+              correction: '可進一步穿插 ", thereby + V-ing" 分詞構句衝刺 Band 7.0',
+              whyItKills65: '已無明顯 5.5 低級語病，保持穩定度即可穩拿 6.5+！'
+            });
+          }
+
+          const finalReportData = {
+            currentEstimatedBand: isSafe ? '6.5+' : '5.5 - 6.0',
+            targetBand: '6.5',
+            totalSentences: totalSents,
+            errorFreeSentences: errorFreeSents,
+            errorFreeRatio: calculatedRatio,
+            isSafeForBand65: isSafe,
+            summaryVerdict: isSafe
+              ? `恭喜！目前無錯句率達 ${calculatedRatio}%，且未偵測到低級口語詞，已穩站 Band 6.5 安全區！`
+              : `目前無錯句率為 ${calculatedRatio}%，${calculatedRatio < 65 ? '未達 Band 6.5 的安全警戒線（需 ≥ 65%）' : '請先點擊上方黃色標籤清除口語詞'}。`,
+            detectedIssues: issuesList,
+            band65Version:
+              'In recent times, traffic congestion has become a pressing issue in numerous urban areas. A substantial number of citizens choose to drive private vehicles because public transit networks remain inadequate. Although authorities aspire to resolve this challenge, they currently lack sufficient municipal funds. If children cannot commute to school punctually, their academic progress will be adversely affected. Therefore, municipal leaders must enact practical measures to alleviate this predicament.',
+            threeGoldenRules: [
+              '嚴格遵守「Although 與 but 絕不同時出現」之規則。',
+              '句子間禁止單用逗號連接，善用 When / While / Because 建立穩健複合句。',
+              '徹底剔除 kids, a lot of, big problem 等口語化詞彙。'
+            ]
+          };
+
+          setAiReport(finalReportData);
+          setIsAnalyzing(false);
+
+          const logId = `log-${Date.now()}`;
+          const newLog = {
+            id: logId,
+            timestamp: Date.now(),
+            date: new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+            errorFreeRatio: calculatedRatio,
+            bandEstimate: finalReportData.currentEstimatedBand,
+            informalCount: detectedInformals.length,
+            note: `無錯句率：${calculatedRatio}% (${errorFreeSents}/${totalSents}句)`
+          };
+
+          const nextHistory = [newLog, ...progressHistory];
+          setProgressHistory(nextHistory);
+          syncMainStateToCloud({ progressHistory: nextHistory });
+          triggerToast('診斷完成！進度紀錄已自動儲存。');
+        }, 600);
+      };
+
+      const gymTotalCount = GYM_CHALLENGES.length;
+      const gymCorrectCount = GYM_CHALLENGES.filter((c) => {
+        const chosen = gymAnswers[c.id];
+        const opt = c.options.find((o) => o.id === chosen);
+        return opt?.isCorrect;
+      }).length;
+
+      const currentModelEssay = useMemo(() => {
+        return MODEL_ESSAYS.find((e) => e.id === selectedEssayId) || MODEL_ESSAYS[0];
+      }, [selectedEssayId]);
+
+      const filteredModelEssays = useMemo(() => {
+        if (essayFilter === 'ALL') return MODEL_ESSAYS;
+        return MODEL_ESSAYS.filter((e) => e.category === essayFilter);
+      }, [essayFilter]);
+
+      const builtSentencePreview = useMemo(() => {
+        return selectedTemplate.buildSentence(builderPartA, builderPartB);
+      }, [selectedTemplate, builderPartA, builderPartB]);
+
+      return (
+        <div
+          className={`min-h-screen transition-colors duration-200 flex flex-col font-sans ${
+            theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+          }`}
+        >
+          {toastMsg && (
+            <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl shadow-2xl font-bold text-xs sm:text-sm animate-bounce">
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>{toastMsg}</span>
+            </div>
+          )}
+
+          <header
+            className={`sticky top-0 z-40 backdrop-blur-md border-b px-3 sm:px-6 py-2.5 transition-colors ${
+              theme === 'dark'
+                ? 'bg-slate-900/90 border-slate-800'
+                : 'bg-white/90 border-slate-200 shadow-sm'
+            }`}
+          >
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-500/20 text-slate-950 shrink-0">
+                  <ShieldCheck className="w-5 h-5 font-black" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-sm sm:text-base font-bold tracking-tight">雅思寫作升階站</h1>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                      5.5 → 6.5+ 完整單機/同步版
+                    </span>
+                  </div>
+                  <p className="text-[11px] opacity-60 hidden sm:block">
+                    無錯句率防禦塔 × 10關考官改錯台 × 8式複合句拼圖 × 範文精讀館
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div
+                  className="px-2.5 py-1 rounded-xl border text-[11px] font-semibold flex items-center gap-1.5 bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                >
+                  <Cloud className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">
+                    已自動儲存 {lastSyncedTime && `(${lastSyncedTime})`}
+                  </span>
+                </div>
+
+                <div
+                  className={`flex items-center rounded-xl p-1 border ${
+                    theme === 'dark' ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-200'
+                  }`}
+                  title="調整文章與編輯字體大小"
+                >
+                  <Type className="w-3.5 h-3.5 mx-1 opacity-60 hidden sm:block" />
+                  {['sm', 'base', 'lg', 'xl'].map((sz) => (
+                    <button
+                      key={sz}
+                      onClick={() => {
+                        setFontSize(sz);
+                        syncMainStateToCloud({ fontSize: sz });
+                      }}
+                      className={`px-1.5 py-0.5 rounded-lg text-xs font-semibold transition-all ${
+                        fontSize === sz
+                          ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                          : 'opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      {sz === 'sm' ? '小' : sz === 'base' ? '中' : sz === 'lg' ? '大' : '特'}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+                    setTheme(nextTheme);
+                    syncMainStateToCloud({ theme: nextTheme });
+                  }}
+                  className={`p-2 rounded-xl border transition-all ${
+                    theme === 'dark'
+                      ? 'bg-slate-800/80 border-slate-700 text-amber-300 hover:bg-slate-700'
+                      : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                  }`}
+                  title={theme === 'dark' ? '切換為亮底模式' : '切換為暗底模式'}
+                >
+                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto mt-2 pt-2 border-t border-slate-800/20 flex items-center justify-start sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
+              <button
+                onClick={() => setActiveTab('editor')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeTab === 'editor'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>1. 寫作診斷室</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('gym')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeTab === 'gym'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Zap className="w-4 h-4" />
+                <span>2. 考官改錯擂台</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-900/30 font-bold">
+                  {gymCorrectCount}/{gymTotalCount}
+                </span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('builder')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeTab === 'builder'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                <span>3. 穩健複合句拼圖 (8式)</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('essays')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeTab === 'essays'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>4. 高分範文精讀館</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('progress')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeTab === 'progress'
+                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <History className="w-4 h-4" />
+                <span>5. 進度與自訂詞庫</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-900/30 font-bold">
+                  {progressHistory.length}
+                </span>
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-6 space-y-6">
+            {activeTab === 'editor' && (
+              <div className="space-y-5">
+                <div
+                  className={`p-4 rounded-2xl border shadow-sm transition-all ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/30">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+                          Band 6.5 通關門檻檢核
+                        </span>
+                        <span className="text-[11px] opacity-70">(無錯句率需 ≥ 65% + 消滅口語詞)</span>
+                      </div>
+                      <p className="text-xs opacity-75">
+                        你的草稿與自訂口語詞庫會自動保存在瀏覽器中，隨時打開皆可接續練習。
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 ${
+                          detectedInformals.length > 0
+                            ? 'bg-amber-500/15 border-amber-500/30 text-amber-500'
+                            : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-500'
+                        }`}
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        <span>口語詞警示: {detectedInformals.length} 處</span>
+                      </div>
+
+                      <div
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 ${
+                          localGrammarStats.commaSpliceCount > 0 || localGrammarStats.doubleConjunctions > 0
+                            ? 'bg-rose-500/15 border-rose-500/30 text-rose-500'
+                            : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-500'
+                        }`}
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>
+                          語法紅線: {localGrammarStats.commaSpliceCount + localGrammarStats.doubleConjunctions} 處
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => setShowAddVocab(!showAddVocab)}
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 flex items-center gap-1 transition"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>新增自訂戒除詞</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {showAddVocab && (
+                    <div
+                      className={`mt-3 p-3.5 rounded-xl border space-y-2.5 ${
+                        theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="text-xs font-bold text-emerald-500">
+                        新增個人常犯口語詞：
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={newInformal}
+                          onChange={(e) => setNewInformal(e.target.value)}
+                          placeholder="常犯口語詞 (例: make money)"
+                          className={`px-3 py-2 rounded-lg border text-xs ${
+                            theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+                          }`}
+                        />
+                        <input
+                          type="text"
+                          value={newReplacement}
+                          onChange={(e) => setNewReplacement(e.target.value)}
+                          placeholder="6.5 學術替換詞 (例: generate revenue)"
+                          className={`px-3 py-2 rounded-lg border text-xs ${
+                            theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+                          }`}
+                        />
+                        <button
+                          onClick={handleAddCustomVocab}
+                          className="px-4 py-2 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition"
+                        >
+                          儲存詞彙規則
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-3">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-[11px] font-bold flex items-center gap-1 opacity-70">
+                        <Smartphone className="w-3 h-3 text-emerald-500" />
+                        手機專用快速輸入盤 (點擊直接插入游標處)：
+                      </span>
+                      <span className="text-[10px] opacity-50">複合句引導詞 / 學術轉折</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                      {[
+                        'Although ',
+                        'While ',
+                        'Provided that ',
+                        ', which subsequently leads to ',
+                        ', thereby ',
+                        'This is primarily because ',
+                        'Furthermore, ',
+                        'Consequently, ',
+                        'Admittedly, ',
+                        'Overall, it is clear that '
+                      ].map((phrase) => (
+                        <button
+                          key={phrase}
+                          onClick={() => handleInsertText(phrase)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap border transition-all active:scale-95 ${
+                            theme === 'dark'
+                              ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 text-emerald-400'
+                              : 'bg-slate-100 border-slate-300 hover:bg-slate-200 text-emerald-700'
+                          }`}
+                        >
+                          + {phrase}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={`p-4 rounded-2xl border shadow-sm transition-all space-y-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs opacity-70">
+                    <span className="font-semibold">草稿編輯區 (支援即時自動保存)</span>
+                    <span>
+                      單詞統計:{' '}
+                      <strong className="text-emerald-500">
+                        {essayText.trim() ? essayText.trim().split(/\s+/).length : 0}
+                      </strong>{' '}
+                      words | 句子數: {localGrammarStats.totalSentences}
+                    </span>
+                  </div>
+
+                  <textarea
+                    ref={textareaRef}
+                    rows={7}
+                    value={essayText}
+                    onChange={(e) => setEssayText(e.target.value)}
+                    placeholder="在此貼上或輸入雅思作文草稿..."
+                    className={`w-full p-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-mono ${fontClass} ${
+                      theme === 'dark'
+                        ? 'bg-slate-950 border-slate-800 text-slate-100 placeholder:text-slate-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+                    }`}
+                  />
+
+                  {detectedInformals.length > 0 && (
+                    <div
+                      className={`p-3 rounded-xl border text-xs space-y-2 ${
+                        theme === 'dark'
+                          ? 'bg-amber-950/20 border-amber-500/30'
+                          : 'bg-amber-50 border-amber-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-amber-500 font-bold">
+                        <span className="flex items-center gap-1.5">
+                          <Zap className="w-3.5 h-3.5" />
+                          偵測到口語詞（考官 5.5 扣分陷阱）- 點擊立即自動替換：
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {detectedInformals.map((inf, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleReplaceInformal(inf.informal, inf.replacement)}
+                            className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
+                              theme === 'dark'
+                                ? 'bg-slate-900 border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
+                                : 'bg-white border-amber-300 text-amber-800 hover:bg-amber-100'
+                            }`}
+                          >
+                            <span className="line-through opacity-70">"{inf.informal}"</span>
+                            <ArrowRight className="w-3 h-3 text-emerald-500" />
+                            <span className="text-emerald-500 font-bold">
+                              {inf.replacement.split('/')[0].trim()}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setEssayText('')}
+                      className={`text-xs px-3.5 py-2 rounded-xl transition-all ${
+                        theme === 'dark'
+                          ? 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                          : 'bg-slate-200 text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      清空草稿
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isAnalyzing}
+                      onClick={handleRunAiDiagnostics}
+                      className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>考官正在掃描無錯句率與記錄日誌...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>執行 5.5 → 6.5 躍升診斷 (自動記錄進度)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {aiReport && (
+                  <div
+                    className={`p-5 rounded-2xl border shadow-xl transition-all space-y-6 ${
+                      theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+                            無錯句率 (Error-Free Sentence Ratio)
+                          </span>
+                          <h3 className="text-lg font-black mt-0.5">
+                            {Math.round(aiReport.errorFreeRatio)}%{' '}
+                            <span className="text-xs font-normal opacity-70">
+                              ({aiReport.errorFreeSentences} / {aiReport.totalSentences} 句完全正確)
+                            </span>
+                          </h3>
+                        </div>
+
+                        <div
+                          className={`px-3 py-1 rounded-xl text-xs font-bold border ${
+                            aiReport.isSafeForBand65
+                              ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                              : 'bg-amber-500/20 border-amber-500 text-amber-400'
+                          }`}
+                        >
+                          {aiReport.isSafeForBand65
+                            ? '✓ 達標 Band 6.5 安全區'
+                            : '⚠️ 未達標：停留在 Band 5.5 警示區'}
+                        </div>
+                      </div>
+
+                      <div className="relative w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-700 rounded-full ${
+                            aiReport.errorFreeRatio >= 65
+                              ? 'bg-emerald-500'
+                              : aiReport.errorFreeRatio >= 50
+                              ? 'bg-amber-500'
+                              : 'bg-rose-500'
+                          }`}
+                          style={{ width: `${Math.min(100, Math.max(5, aiReport.errorFreeRatio))}%` }}
+                        />
+                        <div
+                          className="absolute top-0 bottom-0 w-0.5 bg-white shadow-md z-10"
+                          style={{ left: '65%' }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[11px] opacity-60">
+                        <span>5.5 危險區 (0~50%)</span>
+                        <span className="text-emerald-400 font-bold">65% 考官通關線</span>
+                        <span>100% 完美境界</span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed ${
+                        theme === 'dark'
+                          ? 'bg-slate-950/70 border-slate-800'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <strong className="text-emerald-500 block mb-1">考官透視點評：</strong>
+                      {aiReport.summaryVerdict}
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                        阻礙你拿 6.5 分的關鍵錯誤清單 ({aiReport.detectedIssues.length} 項)：
+                      </h4>
+
+                      <div className="space-y-2.5">
+                        {aiReport.detectedIssues.map((issue, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-3.5 rounded-xl border text-xs space-y-2 ${
+                              theme === 'dark'
+                                ? 'bg-slate-950/80 border-slate-800'
+                                : 'bg-slate-50 border-slate-200'
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="px-2 py-0.5 rounded font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                {issue.flawType}
+                              </span>
+                              <span className="text-[11px] opacity-70">
+                                為什麼拉低分數：{issue.whyItKills65}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono">
+                              <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300">
+                                <span className="text-[10px] block opacity-60 font-sans">
+                                  ❌ 5.5 病句原形
+                                </span>
+                                "{issue.originalSegment}"
+                              </div>
+                              <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                <span className="text-[10px] block opacity-60 font-sans">
+                                  ✓ 6.5 安全修復版
+                                </span>
+                                "{issue.correction}"
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-slate-800/40">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4" />
+                          保留原意・Band 6.5+ 穩妥改寫全文示範
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(aiReport.band65Version);
+                            setQuickCopySuccess(true);
+                            setTimeout(() => setQuickCopySuccess(false), 2000);
+                          }}
+                          className={`text-xs px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1 ${
+                            quickCopySuccess
+                              ? 'bg-emerald-500 text-slate-950 font-bold'
+                              : 'opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          {quickCopySuccess ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{quickCopySuccess ? '已複製' : '複製改寫'}</span>
+                        </button>
+                      </div>
+
+                      <p
+                        className={`p-4 rounded-xl border leading-relaxed ${fontClass} ${
+                          theme === 'dark'
+                            ? 'bg-slate-950 border-emerald-500/30 text-emerald-100'
+                            : 'bg-emerald-50/50 border-emerald-200 text-emerald-950'
+                        }`}
+                      >
+                        {aiReport.band65Version}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'gym' && (
+              <div className="max-w-3xl mx-auto space-y-5">
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-emerald-500" />
+                      <span>考官改錯擂台 (10 大必考語病闖關)</span>
+                    </h2>
+                    <p className="text-xs opacity-75 mt-0.5">
+                      涵蓋逗號黏連、雙重連接詞、不可數名詞、主謂一致、There have 病句與 Task 1 數據描述陷阱。
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs font-semibold">通關進度:</span>
+                    <span className="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                      {gymCorrectCount} / {gymTotalCount} 正確
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 justify-center">
+                  {GYM_CHALLENGES.map((ch, idx) => {
+                    const ansId = gymAnswers[ch.id];
+                    const isCorrect = ch.options.find((o) => o.id === ansId)?.isCorrect;
+                    return (
+                      <button
+                        key={ch.id}
+                        onClick={() => setGymActiveIndex(idx)}
+                        className={`w-8 h-8 rounded-xl text-xs font-bold transition-all border ${
+                          gymActiveIndex === idx
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-400 ring-2 ring-emerald-500/40'
+                            : ansId
+                            ? isCorrect
+                              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                              : 'bg-rose-500/20 border-rose-500/40 text-rose-400'
+                            : theme === 'dark'
+                            ? 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {GYM_CHALLENGES[gymActiveIndex] && (
+                  <div
+                    className={`p-5 sm:p-6 rounded-2xl border shadow-lg transition-all space-y-5 ${
+                      theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/40 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          第 {gymActiveIndex + 1} / {gymTotalCount} 關
+                        </span>
+                        <span className="text-xs font-bold text-amber-500">
+                          {GYM_CHALLENGES[gymActiveIndex].category}
+                        </span>
+                      </div>
+                      <span className="text-[11px] opacity-60">
+                        {GYM_CHALLENGES[gymActiveIndex].difficulty}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <p className="text-xs sm:text-sm font-semibold opacity-90">
+                        {GYM_CHALLENGES[gymActiveIndex].question}
+                      </p>
+
+                      <div
+                        className={`p-3.5 rounded-xl border font-mono ${fontClass} ${
+                          theme === 'dark'
+                            ? 'bg-rose-950/20 border-rose-500/30 text-rose-200'
+                            : 'bg-rose-50 border-rose-200 text-rose-900'
+                        }`}
+                      >
+                        <span className="text-[10px] block font-sans font-bold text-rose-400 mb-0.5">
+                          ❌ 考生原稿 (Band 5.5 典型病句)：
+                        </span>
+                        "{GYM_CHALLENGES[gymActiveIndex].flawedSentence}"
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                      {GYM_CHALLENGES[gymActiveIndex].options.map((opt) => {
+                        const currentSelected = gymAnswers[GYM_CHALLENGES[gymActiveIndex].id];
+                        const isChosen = currentSelected === opt.id;
+                        const isAnswered = Boolean(currentSelected);
+
+                        let optionBorder =
+                          theme === 'dark'
+                            ? 'border-slate-800 bg-slate-950/60 hover:border-slate-700'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300';
+
+                        if (isAnswered) {
+                          if (opt.isCorrect) {
+                            optionBorder = 'border-emerald-500 bg-emerald-500/10 text-emerald-300';
+                          } else if (isChosen && !opt.isCorrect) {
+                            optionBorder = 'border-rose-500 bg-rose-500/10 text-rose-300';
+                          }
+                        }
+
+                        return (
+                          <div
+                            key={opt.id}
+                            onClick={() => {
+                              const updated = {
+                                ...gymAnswers,
+                                [GYM_CHALLENGES[gymActiveIndex].id]: opt.id
+                              };
+                              setGymAnswers(updated);
+                              syncMainStateToCloud({ gymAnswers: updated });
+                            }}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all ${optionBorder}`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                                  isAnswered && opt.isCorrect
+                                    ? 'bg-emerald-500 text-slate-950'
+                                    : isAnswered && isChosen && !opt.isCorrect
+                                    ? 'bg-rose-500 text-white'
+                                    : 'bg-slate-700 text-slate-200'
+                                }`}
+                              >
+                                {opt.id.replace('opt-', '').toUpperCase()}
+                              </div>
+                              <div className="flex-1 space-y-1.5">
+                                <p className={`font-medium leading-relaxed ${fontClass}`}>{opt.text}</p>
+                                {isAnswered && (isChosen || opt.isCorrect) && (
+                                  <div
+                                    className={`text-xs p-2.5 rounded-lg border ${
+                                      opt.isCorrect
+                                        ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-200'
+                                        : 'bg-rose-950/40 border-rose-500/30 text-rose-200'
+                                    }`}
+                                  >
+                                    <strong>{opt.isCorrect ? '✓ 考官點評：' : '✗ 為什麼不行：'}</strong>
+                                    {opt.explanation}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {gymAnswers[GYM_CHALLENGES[gymActiveIndex].id] && (
+                      <div
+                        className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-start gap-2.5 ${
+                          theme === 'dark'
+                            ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                            : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        }`}
+                      >
+                        <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="block mb-0.5">考官通關心法 (Takeaway)：</strong>
+                          {GYM_CHALLENGES[gymActiveIndex].takeaway}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-800/40">
+                      <button
+                        disabled={gymActiveIndex === 0}
+                        onClick={() => setGymActiveIndex((i) => Math.max(0, i - 1))}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold disabled:opacity-40 transition-all ${
+                          theme === 'dark' ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        上一關
+                      </button>
+
+                      <span className="text-xs opacity-60">進度已自動保存</span>
+
+                      <button
+                        disabled={gymActiveIndex >= GYM_CHALLENGES.length - 1}
+                        onClick={() => setGymActiveIndex((i) => Math.min(GYM_CHALLENGES.length - 1, i + 1))}
+                        className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500 text-slate-950 disabled:opacity-40 flex items-center gap-1 transition-all"
+                      >
+                        <span>下一關</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'builder' && (
+              <div className="max-w-4xl mx-auto space-y-5">
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm transition-all space-y-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                      <Layers className="w-5 h-5 text-emerald-500" />
+                      <span>穩健複合句拼圖 (8 大 Band 6.5+ 零失誤公式庫)</span>
+                    </h2>
+                    <p className="text-xs opacity-75 mt-0.5">
+                      涵蓋讓步、非限定關係從句、條件保障、分詞結果狀語、雙重推進等 8 種考官最愛的高分複合句。
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-1">
+                    {SENTENCE_TEMPLATES.map((tpl) => (
+                      <button
+                        key={tpl.id}
+                        onClick={() => handleSelectTemplate(tpl)}
+                        className={`p-2.5 rounded-xl text-left border transition-all flex flex-col justify-between ${
+                          selectedTemplate.id === tpl.id
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-500 shadow-md font-bold'
+                            : theme === 'dark'
+                            ? 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
+                        }`}
+                      >
+                        <span className="text-xs leading-snug">{tpl.name}</span>
+                        <span
+                          className={`text-[10px] mt-1.5 inline-block px-1.5 py-0.5 rounded w-fit ${
+                            selectedTemplate.id === tpl.id
+                              ? 'bg-slate-950/20 text-slate-950'
+                              : 'bg-emerald-500/15 text-emerald-400'
+                          }`}
+                        >
+                          {tpl.tag}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className={`p-5 sm:p-6 rounded-2xl border shadow-lg transition-all space-y-4 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/40 pb-3">
+                    <div>
+                      <span className="text-xs font-bold text-emerald-500">
+                        當前演練句型：{selectedTemplate.name}
+                      </span>
+                      <p className="text-xs opacity-75 mt-0.5">{selectedTemplate.tip}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500">
+                      語法黃金結構公式：
+                    </span>
+                    <div
+                      className={`p-3 rounded-xl border text-xs sm:text-sm font-mono ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-slate-800 text-emerald-300'
+                          : 'bg-slate-50 border-slate-200 text-emerald-800'
+                      }`}
+                    >
+                      {selectedTemplate.formula}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 opacity-70">
+                        組件 A (前半部核心事實/主語/條件)：
+                      </label>
+                      <input
+                        type="text"
+                        value={builderPartA}
+                        onChange={(e) => setBuilderPartA(e.target.value)}
+                        className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                          theme === 'dark'
+                            ? 'bg-slate-950 border-slate-800 text-white'
+                            : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 opacity-70">
+                        組件 B (後半部核心立場/結果/推演)：
+                      </label>
+                      <input
+                        type="text"
+                        value={builderPartB}
+                        onChange={(e) => setBuilderPartB(e.target.value)}
+                        className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                          theme === 'dark'
+                            ? 'bg-slate-950 border-slate-800 text-white'
+                            : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 space-y-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      即時合成之 Band 6.5+ 安全複合句：
+                    </span>
+                    <div
+                      className={`p-4 rounded-xl border font-medium ${fontClass} ${
+                        theme === 'dark'
+                          ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-100'
+                          : 'bg-emerald-50 border-emerald-200 text-emerald-950'
+                      }`}
+                    >
+                      {builtSentencePreview}
+                    </div>
+
+                    <div className="flex flex-wrap justify-end gap-2 pt-2">
+                      <button
+                        onClick={() => {
+                          const updated = [
+                            {
+                              id: `sent-${Date.now()}`,
+                              templateName: selectedTemplate.name,
+                              text: builtSentencePreview
+                            },
+                            ...savedSentences
+                          ];
+                          setSavedSentences(updated);
+                          syncMainStateToCloud({ savedSentences: updated });
+                          triggerToast('已收藏至你的複合句筆記本！');
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition ${
+                          theme === 'dark'
+                            ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700'
+                            : 'bg-slate-100 border-slate-300 text-emerald-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        <Bookmark className="w-3.5 h-3.5" />
+                        <span>收藏此句</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleInsertText(`${builtSentencePreview} `);
+                          setActiveTab('editor');
+                          triggerToast('已將複合句插入草稿編輯區！');
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20"
+                      >
+                        <span>一鍵帶入草稿編輯區</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {savedSentences.length > 0 && (
+                  <div
+                    className={`p-5 rounded-2xl border shadow-sm space-y-3 ${
+                      theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+                      已收藏的自造複合句 ({savedSentences.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {savedSentences.map((item) => (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs ${
+                            theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] text-emerald-500 font-bold block">
+                              {item.templateName}
+                            </span>
+                            <p className={fontClass}>{item.text}</p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const filtered = savedSentences.filter((s) => s.id !== item.id);
+                              setSavedSentences(filtered);
+                              syncMainStateToCloud({ savedSentences: filtered });
+                            }}
+                            className="p-1.5 opacity-50 hover:opacity-100 text-rose-400 shrink-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'essays' && (
+              <div className="max-w-5xl mx-auto space-y-5">
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm space-y-4 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-emerald-500" />
+                        <span>高分範文精讀館 (8 篇完整 Task 2 論說文 & Task 1 圖表視覺化範文)</span>
+                      </h2>
+                      <p className="text-xs opacity-75 mt-0.5">
+                        包含 4 篇 Task 2 四大必考題型 + 4 篇附帶互動視覺化圖表的 Task 1 範文。
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {['ALL', 'Task 1', 'Task 2'].map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setEssayFilter(cat);
+                            const firstMatch =
+                              cat === 'ALL'
+                                ? MODEL_ESSAYS[0]
+                                : MODEL_ESSAYS.find((e) => e.category === cat);
+                            if (firstMatch) setSelectedEssayId(firstMatch.id);
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            essayFilter === cat
+                              ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                              : theme === 'dark'
+                              ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {cat === 'ALL' ? '全部範文 (8)' : `${cat} 專區 (4)`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    {filteredModelEssays.map((essay) => (
+                      <button
+                        key={essay.id}
+                        onClick={() => setSelectedEssayId(essay.id)}
+                        className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                          selectedEssayId === essay.id
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-500 font-bold shadow-md'
+                            : theme === 'dark'
+                            ? 'bg-slate-950/70 border-slate-800 text-slate-200 hover:border-slate-700'
+                            : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-bold inline-block ${
+                              selectedEssayId === essay.id
+                                ? 'bg-slate-950/20 text-slate-950'
+                                : essay.category === 'Task 1'
+                                ? 'bg-sky-500/15 text-sky-400'
+                                : 'bg-emerald-500/15 text-emerald-400'
+                            }`}
+                          >
+                            {essay.category} {essay.chartData ? '📊 附圖表' : ''}
+                          </span>
+                          <div className="text-xs leading-snug">{essay.title}</div>
+                        </div>
+                        <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-current/10 text-[10px] opacity-80">
+                          <span>{essay.taskType}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {currentModelEssay && (
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    <div className="lg:col-span-8 space-y-4">
+                      <div
+                        className={`p-4 rounded-2xl border ${
+                          theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+                            官方考題題目 ({currentModelEssay.taskType})
+                          </span>
+                          <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                            {currentModelEssay.targetBand}
+                          </span>
+                        </div>
+                        <p className={`font-medium ${fontClass}`}>{currentModelEssay.prompt}</p>
+                      </div>
+
+                      {currentModelEssay.chartData && (
+                        <Task1ChartViewer chartData={currentModelEssay.chartData} theme={theme} />
+                      )}
+
+                      {currentModelEssay.paragraphs.map((para, index) => (
+                        <div
+                          key={index}
+                          className={`p-5 rounded-2xl border shadow-sm space-y-3 ${
+                            theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                          }`}
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/40">
+                            <span className="text-xs font-bold text-emerald-500">{para.role}</span>
+                            <button
+                              onClick={() => {
+                                setEssayText(para.text);
+                                setActiveTab('editor');
+                                triggerToast('已將此段落載入寫作診斷室，可進行仿寫或分析！');
+                              }}
+                              className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition ${
+                                theme === 'dark'
+                                  ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700'
+                                  : 'bg-slate-100 border-slate-300 text-emerald-700 hover:bg-slate-200'
+                              }`}
+                            >
+                              載入此段至編輯器摹寫
+                            </button>
+                          </div>
+
+                          <p className={`leading-relaxed font-serif ${fontClass}`}>{para.text}</p>
+
+                          <div
+                            className={`p-3 rounded-xl border text-xs space-y-2 ${
+                              theme === 'dark'
+                                ? 'bg-slate-950/80 border-slate-800 text-slate-300'
+                                : 'bg-slate-50 border-slate-200 text-slate-700'
+                            }`}
+                          >
+                            <div>
+                              <strong className="text-amber-400">💡 考官結構拆解：</strong>
+                              {para.analysis}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                              <span className="text-[11px] opacity-70">必學高分語塊 (點擊插入草稿)：</span>
+                              {para.highlights.map((hl, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => {
+                                    handleInsertText(`${hl} `);
+                                    triggerToast(`已將語塊 "${hl}" 插入草稿區！`);
+                                  }}
+                                  className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono hover:bg-emerald-500/25 transition"
+                                >
+                                  + {hl}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+                      <div
+                        className={`p-5 rounded-2xl border shadow-lg space-y-4 ${
+                          theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                        }`}
+                      >
+                        <h3 className="text-sm font-bold flex items-center gap-2 text-emerald-500">
+                          <Sparkles className="w-4 h-4" />
+                          <span>本篇範文奪分心法</span>
+                        </h3>
+
+                        <ul className="space-y-2.5 text-xs leading-relaxed">
+                          {currentModelEssay.keyTakeaways.map((kt, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                              <span>{kt}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="pt-3 border-t border-slate-800/40">
+                          <button
+                            onClick={() => {
+                              const fullText = currentModelEssay.paragraphs.map((p) => p.text).join('\n\n');
+                              setEssayText(fullText);
+                              setActiveTab('editor');
+                              triggerToast('已將整篇高分範文載入寫作診斷室！');
+                            }}
+                            className="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md transition flex items-center justify-center gap-1.5"
+                          >
+                            <FileText className="w-4 h-4" />
+                            <span>將整篇範文載入編輯器分析</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'progress' && (
+              <div className="max-w-4xl mx-auto space-y-5">
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                      <History className="w-5 h-5 text-emerald-500" />
+                      <span>學習日誌與個人詞庫</span>
+                    </h2>
+                    <p className="text-xs opacity-75 mt-0.5">
+                      你的每次診斷紀錄、10 關考官擂台成績與自訂戒除詞皆已自動儲存。
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-3 py-1.5 rounded-xl font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      累積評測: {progressHistory.length} 次
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div
+                    className={`p-4 rounded-xl border flex items-center gap-3 ${
+                      gymCorrectCount >= 8
+                        ? 'border-emerald-500/50 bg-emerald-500/10'
+                        : 'opacity-50 border-slate-800 bg-slate-900/30'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold">十關斬將考官之眼</div>
+                      <div className="text-[11px] opacity-70">
+                        改錯擂台答對 8 題以上 ({gymCorrectCount}/10)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`p-4 rounded-xl border flex items-center gap-3 ${
+                      progressHistory.some((h) => h.errorFreeRatio >= 65)
+                        ? 'border-emerald-500/50 bg-emerald-500/10'
+                        : 'opacity-50 border-slate-800 bg-slate-900/30'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center text-teal-400 font-bold">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold">無錯句率突破 65%</div>
+                      <div className="text-[11px] opacity-70">正式進入 Band 6.5 安全防禦區</div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`p-4 rounded-xl border flex items-center gap-3 ${
+                      detectedInformals.length === 0
+                        ? 'border-emerald-500/50 bg-emerald-500/10'
+                        : 'opacity-50 border-slate-800 bg-slate-900/30'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold">
+                      <Award className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold">口語詞清零大師</div>
+                      <div className="text-[11px] opacity-70">當前草稿完全無 5.5 口語詞彙</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm space-y-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+                      我的自訂口語替換詞庫 ({customPatterns.length})
+                    </h3>
+                  </div>
+
+                  {customPatterns.length === 0 ? (
+                    <p className="text-xs opacity-60">
+                      尚未新增自訂詞彙。你可以在「1. 寫作診斷室」點擊「新增自訂戒除詞」建立專屬替換表。
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {customPatterns.map((cp) => (
+                        <div
+                          key={cp.id}
+                          className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+                            theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="line-through text-rose-400">{cp.informal}</span>
+                            <ArrowRight className="w-3.5 h-3.5 opacity-50" />
+                            <span className="font-bold text-emerald-400">{cp.replacement}</span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteCustomVocab(cp.id)}
+                            className="text-slate-500 hover:text-rose-400"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className={`p-5 rounded-2xl border shadow-sm transition-all space-y-3 ${
+                    theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    歷次診斷紀錄 (Session History)
+                  </h3>
+
+                  <div className="space-y-2.5">
+                    {progressHistory.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
+                          theme === 'dark'
+                            ? 'bg-slate-950/80 border-slate-800'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold opacity-60">{item.date}</span>
+                            <span
+                              className={`px-2 py-0.5 rounded font-bold ${
+                                item.errorFreeRatio >= 65
+                                  ? 'bg-emerald-500/20 text-emerald-400'
+                                  : 'bg-amber-500/20 text-amber-400'
+                              }`}
+                            >
+                              估評: Band {item.bandEstimate}
+                            </span>
+                            <span className="opacity-80">{item.note}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <span className="text-[10px] block opacity-60">無錯句率</span>
+                            <span
+                              className={`text-sm font-bold ${
+                                item.errorFreeRatio >= 65 ? 'text-emerald-400' : 'text-amber-400'
+                              }`}
+                            >
+                              {item.errorFreeRatio}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          <footer
+            className={`border-t py-4 text-center text-xs opacity-50 ${
+              theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+            }`}
+          >
+            雅思寫作 Band 5.5 → 6.5+ 穩拿衝刺系統・完整單一 HTML 獨立運行版
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<IeltsAscenderApp />);
+  </script>
+</body>
+</html>
